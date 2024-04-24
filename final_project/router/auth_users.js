@@ -53,11 +53,11 @@ regd_users.post("/login", (req,res) => {
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
   let reviewList = books[req.params.isbn].reviews;
-  let user = req.session.authorization.user
+  let user = req.session.authorization["username"];
   let reviewIndex = 1; // default to 1 in case of empty review list
   let found = false;
   // check to see if the user left a review already
-  for(let i=1; i<Object.keys(reviewList).length; i++) {
+  for(let i=1; i<=Object.keys(reviewList).length; i++) {
     if(reviewList[i].user == user) {
         found = true;
         reviewIndex = i;
@@ -70,6 +70,31 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
   reviewList[reviewIndex] = {"user": user, "review": req.body.review}; // add/edit review
 
   return res.status(200).json({message: "Review added to ISBN " + req.params.isbn + " with review: " + req.body.review});
+});
+
+// Delete a book review
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    let reviewList = books[req.params.isbn].reviews;
+    let user = req.session.authorization["username"];
+    let reviewIndex = 1; // default to 1 in case of empty review list
+    let found = false;
+
+    // check to see if the user left a review already
+    for(let i=1; i<=Object.keys(reviewList).length; i++) {
+      if(reviewList[i].user == user) {
+          found = true;
+          reviewIndex = i;
+          break;
+      }
+    }
+    if(found) {
+      let oldReview = reviewList[reviewIndex].review;
+      delete reviewList[reviewIndex];
+      return res.status(200).json({message: "Review deleted from ISBN " + req.params.isbn + ": " + oldReview});
+    }
+    else {
+        return res.status(404).json({message: "You haven't left a review on ISBN " + req.params.isbn});
+    }
 });
 
 module.exports.authenticated = regd_users;
