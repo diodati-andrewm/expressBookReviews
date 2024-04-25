@@ -31,18 +31,32 @@ public_users.post("/register", (req,res) => {
 });
 
 // Get the book list available in the shop
-public_users.get('/',function (req, res) {
-  return res.status(200).json(books);
+public_users.get('/',async function (req, res) {
+    try {
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // simulating async call
+        return res.status(200).json(books);
+    }
+    catch (error) {
+        return res.status(404).json({message: "Error retriving books: " + error})
+    }
+  
 });
 
 // Get book details based on ISBN
-public_users.get('/isbn/:isbn',function (req, res) {
+public_users.get('/isbn/:isbn', async function (req, res) {
   let isbn = req.params.isbn;
-  res.send(books[isbn]);
+  try {
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // simulating async call
+    res.send(books[isbn]);
+  }
+  catch (error) {
+    return res.status(500).json({message: "error retrieving book by ISBN: "+ error})
+  }
+  
  });
   
 // Get book details based on author
-public_users.get('/author/:author',function (req, res) {
+public_users.get('/author/:author', async function (req, res) {
   let author = req.params.author;
   let bookList = [];
   for(let i=1; i<Object.keys(books).length; i++) {
@@ -50,17 +64,24 @@ public_users.get('/author/:author',function (req, res) {
         bookList.push(books[i]);
     }
   }
-  if(bookList.length > 0) {
-    res.send(bookList);
+  try {
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // simulating async call
+    if(bookList.length > 0) {
+        res.send(bookList);
+      }
+      else {
+        return res.status(404).json({message: "Author not found: " + author});
+      }
   }
-  else {
-    return res.status(404).json({message: "Author not found: " + author});
+  catch (error) {
+    return res.status(500).json({message: "error retrieving book by author: "+ error})
   }
+  
   
 });
 
 // Get all books based on title
-public_users.get('/title/:title',function (req, res) {
+public_users.get('/title/:title', async function (req, res) {
   let title = req.params.title;
   let bookList = [];
   for(let i=1; i<Object.keys(books).length; i++) {
@@ -68,12 +89,19 @@ public_users.get('/title/:title',function (req, res) {
         bookList.push(books[i]);
     }
   }
-  if(bookList.length > 0) {
-    res.send(bookList);
+  try {
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // simulating async call
+    if(bookList.length > 0) {
+        res.send(bookList);
+      }
+      else {
+        return res.status(404).json({message: "Title not found: " + title});
+      }
   }
-  else {
-    return res.status(404).json({message: "Title not found: " + title});
+  catch (error) {
+    return res.status(500).json({message: "error retrieving book by title: "+ error})
   }
+  
 });
 
 //  Get book review
